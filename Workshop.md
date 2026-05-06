@@ -1,0 +1,4 @@
+- Définition UC
+- Elaboration des spécifications
+- Draft UI
+- 

@@ -1,0 +1,87 @@
+@startuml
+' --- Style du diagramme ---
+skinparam class {
+    BackgroundColor white
+    ArrowColor #00529B
+    BorderColor #00529B
+}
+skinparam roundcorner 5
+
+' ==========================================
+' DÉCLARATION DES ENTITÉS ET ÉNUMÉRATIONS
+' ==========================================
+
+enum TypeSeance {
+    COURS_MAGISTRAL
+    TD
+    TP
+    EXAMEN
+    AUTRE_EVENEMENT
+}
+
+class Etudiant {
+    + id_etudiant : int
+    + matricule : String
+    + nom : String
+    + prenom : String
+    + email : String
+}
+
+class Enseignant {
+    + id_enseignant : int
+    + nom : String
+    + prenom : String
+    + email : String
+}
+
+class Promotion {
+    + id_promotion : int
+    + nom_promo : String
+    + annee_academique : String
+}
+
+class UniteEnseignement {
+    + id_ue : int
+    + code_ue : String
+    + intitule : String
+    + credits_ects : int
+}
+
+class Cours {
+    + id_cours : int
+    + intitule_cours : String
+    + volume_horaire : int
+}
+
+class Seance {
+    + id_seance : int
+    + date_seance : Date
+    + heure_debut : Time
+    + heure_fin : Time
+    + salle : String
+    + est_synchronise : boolean
+}
+
+' ==========================================
+' RELATIONS ET CARDINALITÉS
+' ==========================================
+
+' Une promotion contient plusieurs étudiants (1..*)
+Promotion "1" -- "*" Etudiant : "contient >"
+
+' Une promotion suit le programme de plusieurs Unités d'Enseignement
+Promotion "1" -- "*" UniteEnseignement : "suit >"
+
+' Une UE est composée de plusieurs Cours/Modules (Composition)
+UniteEnseignement "1" *-- "*" Cours : "est composé de >"
+
+' Un cours est enseigné par un seul enseignant principal (dans ce modèle simple)
+Cours "*" -- "1" Enseignant : "< enseigne"
+
+' Un cours est planifié en plusieurs séances au fil de l'année
+Cours "1" *-- "*" Seance : "planifié en >"
+
+' Une séance a un type défini (Cours, TP, Examen...)
+Seance "*" -right- "1" TypeSeance : "est de type >"
+
+@enduml
