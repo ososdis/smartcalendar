@@ -24,14 +24,73 @@ class DAO:
             "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, role TEXT, email TEXT, google_linked BOOLEAN)"
         )
 
-        # 2. Création de la table Etudiant
-        # 3. Création de la table Enseignant
-        # 4. Création de la table Promotion
-        # 5. Création de la table UniteEnseignement
-        # 6. Création de la table Cours
-        # 7. Création de la table Seance
+        import sqlite3
 
-        # Confirmation des réquêtes dans la transaction
+
+class DAO:
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS etudiant (
+                id_etudiant INTEGER PRIMARY KEY,
+                matricule TEXT,
+                nom TEXT,
+                prenom TEXT,
+                email TEXT,
+                id_promotion INTEGER
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS enseignant (
+                id_enseignant INTEGER PRIMARY KEY,
+                nom TEXT,
+                prenom TEXT,
+                email TEXT
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS promotion (
+                id_promotion INTEGER PRIMARY KEY,
+                nom_promotion TEXT,
+                annee_academique TEXT
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS unite_enseignement (
+                id_ue INTEGER PRIMARY KEY,
+                code_ue TEXT,
+                intitule TEXT,
+                credits INTEGER,
+                id_promotion INTEGER
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS cours (
+                id_cours INTEGER PRIMARY KEY,
+                intitule_cours TEXT,
+                volume_horaire INTEGER,
+                id_ue INTEGER,
+                id_enseignant INTEGER
+            )
+        """)
+
+        
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS seance (
+                id_seance INTEGER PRIMARY KEY,
+                date TEXT,
+                heure_debut TEXT,
+                heure_fin TEXT,
+                salle TEXT,
+                synchro BOOLEAN,
+                id_cours INTEGER,
+                type_seance TEXT
+            )
+        """)
+
         self.conn.commit()
 
 
