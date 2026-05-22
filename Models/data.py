@@ -15,6 +15,7 @@ class PromotionDTO:
         self.etudiants: List[EtudiantDTO] = []
         self.unites_enseignement: List[UniteEnseignementDTO] = []
 
+
 @dataclass
 class EtudiantDTO:
     def __init__(
@@ -111,3 +112,17 @@ class SeanceDTO:
         self.salle = salle
         self.est_synchro = est_synchro
         self.cours_id = cours_id
+
+
+class UserDTO:
+    def __init__(
+        self,
+        id_user: int,
+        role: str,
+        email: str,
+        logedin: bool,
+    ):
+        self.id_user = id_user
+        self.role = role
+        self.email = email
+        self.logedin = logedin

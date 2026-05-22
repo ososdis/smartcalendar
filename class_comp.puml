@@ -1,0 +1,187 @@
+@startuml
+
+' --- Style du diagramme ---
+skinparam class {
+    BackgroundColor white
+    ArrowColor #00529B
+    BorderColor #00529B
+}
+skinparam roundcorner 5
+
+' ==========================================
+' 1. COUCHE DTO (Modèles de données purs)
+' ==========================================
+package "Models (DTOs)" {
+
+    enum TypeSeance {
+        COURS_MAGISTRAL
+        TD
+        TP
+        EXAMEN
+        AUTRE_EVENEMENT
+    }
+
+    class UserDTO {
+        +id: int
+        +email: string
+        +role: string
+        +logedin: boolean
+    }
+
+    class EtudiantDTO {
+        +id_etudiant: int
+        +matricule: String
+        +nom: String
+        +prenom: String
+        +email: String
+    }
+
+    class EnseignantDTO {
+        +id_enseignant: int
+        +nom: String
+        +prenom: String
+        +email: String
+    }
+
+    class PromotionDTO {
+        +id_promotion: int
+        +nom_promo: String
+        +annee_academique: String
+    }
+
+    class UniteEnseignementDTO {
+        +id_ue: int
+        +code_ue: String
+        +intitule: String
+        +credits_ects: int
+    }
+
+    class CoursDTO {
+        +id_cours: int
+        +intitule_cours: String
+        +volume_horaire: int
+    }
+
+    class EventDTO {
+        +id_seance: int
+        +titre: string
+        +date: Date
+        +heure_debut: Time
+        +heure_fin: Time
+        +salle: string
+        +statut_synchro: string
+        +type: TypeSeance
+    }
+
+    class NotificationDTO {
+        +id_notif: int
+        +type: string
+        +destinataires: List<string>
+        +message: string
+        +date_envoi: DateTime
+    }
+}
+
+' ==========================================
+' 2. COUCHE DAO (Accès aux Données)
+' ==========================================
+package "Data Access (DAOs)" {
+
+    interface BaseDAO {
+        +get_by_id(id): Object
+        +get_all(): List<Object>
+        +save(Object)
+        +delete(id)
+    }
+
+    class UserDAO implements BaseDAO {
+        +get_by_email(email): UserDTO
+        +update_token(user_id, token)
+    }
+
+    class EtudiantDAO implements BaseDAO {
+        +get_by_promotion(id_promo): List<EtudiantDTO>
+    }
+
+    class EnseignantDAO implements BaseDAO {
+        +get_by_ue(id_ue): List<EnseignantDTO>
+    }
+
+    class PromotionDAO implements BaseDAO {}
+
+    class UniteEnseignementDAO implements BaseDAO {
+        +get_by_promotion(id_promo): List<UniteEnseignementDTO>
+    }
+
+    class CoursDAO implements BaseDAO {
+        +get_by_ue(id_ue): List<CoursDTO>
+    }
+
+    class EventDAO implements BaseDAO {
+        +get_by_cours(id_cours): List<EventDTO>
+        +get_by_date_range(start, end): List<EventDTO>
+        +update_sync_status(id, status)
+    }
+
+    class NotificationDAO implements BaseDAO {
+        +get_history(): List<NotificationDTO>
+    }
+}
+
+' ==========================================
+' 3. COUCHE UI (Composants Flet)
+' ==========================================
+package "View (Flet Components)" {
+    class AppLayout {
+        -sidebar: SidebarComponent
+        -current_view: Container
+        +navigate_to(route)
+    }
+
+    class CalendrierView {
+        -events: List<EventDTO>
+        +on_drag_drop(e)
+    }
+
+    class EventCard {
+        -data: EventDTO
+        +render()
+    }
+}
+
+' ==========================================
+' 4. COUCHE SERVICES (Logique Métier)
+' ==========================================
+package "Services (Logic)" {
+    class CalendarManager {
+        +import_from_csv(path)
+        +reschedule_event(EventDTO)
+    }
+
+    class SyncService {
+        +sync_with_google(List<EventDTO>)
+    }
+}
+
+' ==========================================
+' RELATIONS
+' ==========================================
+' DTOs utilisent les Enums
+EventDTO "*" -- "1" TypeSeance
+
+' Composition UI
+CalendrierView "1" *-- "*" EventCard
+EventCard o-- EventDTO
+
+' Services utilisent les DAOs
+CalendarManager ..> EventDAO
+CalendarManager ..> CoursDAO
+SyncService ..> EventDAO
+
+' DAOs renvoient des DTOs
+EventDAO ..> EventDTO : "manipule >"
+EtudiantDAO ..> EtudiantDTO : "manipule >"
+CoursDAO ..> CoursDTO : "manipule >"
+UserDAO ..> UserDTO : "manipule >"
+
+@enduml
