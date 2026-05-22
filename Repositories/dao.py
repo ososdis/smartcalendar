@@ -22,7 +22,7 @@ class DAO:
         # Réquêtes de création lors de l'initialisation des tables si elles n'existent pas
         # 1. Création de la table Users sur base de la classe UserDTO
 
-        cursor.execute(
+        cursor.execute(S
             "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, role TEXT, email TEXT, google_linked BOOLEAN)"
         )
 
