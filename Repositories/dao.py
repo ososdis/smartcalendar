@@ -346,7 +346,6 @@ class EnseignantDAO(DAO):
 
         return [EnseignantDTO(r[0], r[1], r[2], r[3]) for r in cursor.fetchall()]
 
-
 class PromotionDAO(DAO):
     def __init__(self, db_path: str = ":memory:"):
         super().__init__(db_path)
