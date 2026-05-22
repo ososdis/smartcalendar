@@ -25,7 +25,7 @@ package "Models (DTOs)" {
         +id: int
         +email: string
         +role: string
-        +google_linked: boolean
+        +logedin: boolean
     }
 
     class EtudiantDTO {
