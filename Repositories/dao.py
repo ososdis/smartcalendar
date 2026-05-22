@@ -27,12 +27,68 @@ class DAO:
         )
 
         # 2. Création de la table Etudiant
+        cursor.execute("""
+CREATE TABLE IF NOT EXISTS etudiant (
+    id_etudiant INTEGER PRIMARY KEY,
+    matricule TEXT,
+    nom TEXT,
+    prenom TEXT,
+    email TEXT,
+    id_promotion INTEGER
+)
+""")
         # 3. Création de la table Enseignant
+        cursor.execute("""
+CREATE TABLE IF NOT EXISTS enseignant (
+    id_enseignant INTEGER PRIMARY KEY,
+    nom TEXT,
+    prenom TEXT,
+    email TEXT,
+    id_ue INTEGER
+)
+""")
         # 4. Création de la table Promotion
-        # 5. Création de la table UniteEnseignement
-        # 6. Création de la table Cours
-        # 7. Création de la table Seance
+        cursor.execute("""
+CREATE TABLE IF NOT EXISTS promotion (
+    id_promotion INTEGER PRIMARY KEY,
+    nom_promo TEXT,
+    annee_academique TEXT
+)
+""")
 
+        # 5. Création de la table UniteEnseignement
+        cursor.execute("""
+CREATE TABLE IF NOT EXISTS unite_enseignement (
+    id_ue INTEGER PRIMARY KEY,
+    code_ue TEXT,
+    intitule TEXT,
+    credits_ects INTEGER,
+    id_promotion INTEGER
+)
+""")
+        # 6. Création de la table Cours
+        cursor.execute("""
+CREATE TABLE IF NOT EXISTS cours (
+    id_cours INTEGER PRIMARY KEY,
+    intitule_cours TEXT,
+    volume_horaire INTEGER,
+    id_ue INTEGER
+)
+""")
+        # 7. Création de la table Seance
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS seance (
+    id_seance INTEGER PRIMARY KEY,
+    titre TEXT,
+    date TEXT,
+    heure_debut TEXT,
+    heure_fin TEXT,
+    salle TEXT,
+    statut_synchro TEXT,
+    type TEXT,
+    id_cours INTEGER
+)
+""")
         # Confirmation des réquêtes dans la transaction
         self.conn.commit()
 
