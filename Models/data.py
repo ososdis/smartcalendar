@@ -120,9 +120,9 @@ class UserDTO:
         id_user: int,
         role: str,
         email: str,
-        google_linked: bool,
+        logedin: bool,
     ):
         self.id_user = id_user
         self.role = role
         self.email = email
-        self.google_linked = google_linked
+        self.logedin = logedin
