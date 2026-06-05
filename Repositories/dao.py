@@ -1,103 +1,31 @@
-# Exercice 1
-# Implémentation des DAOs des modèles DTO suivant le diagramme class_comp.puml
-
 import sqlite3
-from random import randint
-from typing import List, Optional, Protocol
+from typing import Protocol
 
-from Models import EnseignantDTO, EtudiantDTO, UserDTO
+from Models.data import (
+    UserDTO,
+    EtudiantDTO,
+    EnseignantDTO,
+    PromotionDTO,
+    UniteEnseignementDTO,
+    CoursDTO,
+    EventDTO,
+    NotificationDTO,
+)
 
 
-# Exercice 2
+# ==========================
+# CLASSE DAO DE BASE
+# ==========================
+
 class DAO:
-    def __init__(self, db_path: str = ":memory:"):
-        self.conn = sqlite3.connect(db_path, check_same_thread=False)
-        self._setup_db()
-
-    def _setup_db(self):
-        cursor = self.conn.cursor()
-
-        # Création de la table users
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY,
-                role TEXT,
-                email TEXT,
-                logedin BOOLEAN
-            )
-        """)
-
-        # Création de la table etudiant
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS etudiant (
-                id_etudiant INTEGER PRIMARY KEY,
-                matricule TEXT,
-                nom TEXT,
-                prenom TEXT,
-                email TEXT,
-                id_promotion INTEGER
-            )
-        """)
-
-        # Création de la table enseignant
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS enseignant (
-                id_enseignant INTEGER PRIMARY KEY,
-                nom TEXT,
-                prenom TEXT,
-                email TEXT
-            )
-        """)
-
-        # Création de la table promotion
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS promotion (
-                id_promotion INTEGER PRIMARY KEY,
-                nom_promotion TEXT,
-                annee_academique TEXT
-            )
-        """)
-
-        # Création de la table unite_enseignement
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS unite_enseignement (
-                id_ue INTEGER PRIMARY KEY,
-                code_ue TEXT,
-                intitule TEXT,
-                credits INTEGER,
-                id_promotion INTEGER
-            )
-        """)
-
-        # Création de la table cours
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS cours (
-                id_cours INTEGER PRIMARY KEY,
-                intitule_cours TEXT,
-                volume_horaire INTEGER,
-                id_ue INTEGER,
-                id_enseignant INTEGER
-            )
-        """)
-
-        # Création de la table seance
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS seance (
-                id_seance INTEGER PRIMARY KEY,
-                date TEXT,
-                heure_debut TEXT,
-                heure_fin TEXT,
-                salle TEXT,
-                synchro BOOLEAN,
-                id_cours INTEGER,
-                type_seance TEXT
-            )
-        """)
-
-        self.conn.commit()
+    def __init__(self, db_path=":memory:"):
+        self.conn = sqlite3.connect(db_path)
 
 
-# Interface DAO
+# ==========================
+# INTERFACE DAO
+# ==========================
+
 class BaseDAO(Protocol):
 
     def get_by_id(self, id):
@@ -114,3 +42,98 @@ class BaseDAO(Protocol):
 
     def delete(self, obj):
         ...
+
+
+# ==========================
+# USER DAO
+# ==========================
+
+class UserDAO(DAO):
+
+    def get_by_email(self, email):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT * FROM users WHERE email=?",
+            (email,)
+        )
+        return cursor.fetchone()
+
+
+# ==========================
+# ETUDIANT DAO
+# ==========================
+
+class EtudiantDAO(DAO):
+
+    def get_by_promotion(self, id_promotion):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT * FROM etudiant WHERE id_promotion=?",
+            (id_promotion,)
+        )
+        return cursor.fetchall()
+
+
+# ==========================
+# ENSEIGNANT DAO
+# ==========================
+
+class EnseignantDAO(DAO):
+
+    def get_all(self):
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM enseignant")
+        return cursor.fetchall()
+
+
+# ==========================
+# COURS DAO
+# ==========================
+
+class CoursDAO(DAO):
+
+    def get_by_ue(self, id_ue):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT * FROM cours WHERE id_ue=?",
+            (id_ue,)
+        )
+        return cursor.fetchall()
+
+
+# ==========================
+# EVENT DAO
+# ==========================
+
+class EventDAO(DAO):
+
+    def get_by_cours(self, id_cours):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT * FROM seance WHERE id_cours=?",
+            (id_cours,)
+        )
+        return cursor.fetchall()
+
+    def get_by_date_range(self, start_date, end_date):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            SELECT * FROM seance
+            WHERE date BETWEEN ? AND ?
+            """,
+            (start_date, end_date)
+        )
+        return cursor.fetchall()
+
+    def update_sync_status(self, id_seance, status):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            UPDATE seance
+            SET synchro=?
+            WHERE id_seance=?
+            """,
+            (status, id_seance)
+        )
+        self.conn.commit()
