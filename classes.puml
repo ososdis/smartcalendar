@@ -1,0 +1,73 @@
+@startuml
+'--------------------------
+'Style du diagramme
+'-------------------------
+skinparam class {
+    Backgroundcolor Lightblue
+    BorderColor #0a0a0a
+    ArrowColor #00529B
+}
+skinparam roundcorner 5
+
+'
+================================================================================
+'DECLARATION DES ENTITES ET ENUMERATIONS'
+================================================================================
+
+enum StatutReservation {
+    EN_ATTENTE
+    CONFIRMEE
+    ANNULEE
+    }
+
+class Voyageur  {
++ id_voyageur : int
++ nom :string
++ prenom : string
++ email : string
++ telephone : string
+}  
+
+class Offre{
++ id_offre : int
++ destination : string
++ description : string
++ prix : float
++ places_disponibles : int 
++ date_depart : date
++ date_retour : date
+
+}
+
+class Reservation {
++ id_reservation : int 
++ date_reservation : date 
++ statut : string
+
+}
+
+class Paiement {
++ id_paiement : int
++ montant : float
++ mode_paiement : string
++ statut : string
+
+}
+
+class Document {
++ id_document : int 
++ type_document : string 
++ date_generation : date 
+
+}   
+
+'==================================================
+'RELATIONS
+'==================================================
+
+Voyageur "1" --"*" Reservation : effectue  >
+Reservation "*" -- "1" Offre : concerne >
+Reservation "1" *-- "1" Paiement : génère >
+Paiement "1" *-- "1" Document : produit >
+
+@enduml
