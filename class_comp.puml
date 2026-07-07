@@ -1,0 +1,204 @@
+@startuml
+
+' ------------------------------------------
+' Style du diagramme
+' ------------------------------------------
+
+skinparam class {
+    BackgroundColor white
+    ArrowColor #00529B
+    BorderColor #00529B
+}
+skinparam roundcorner 5
+
+' ==========================================
+' 1. MODELS (DTO)
+' ==========================================
+
+package "Models (DTOs)" {
+
+    enum StatutReservation {
+        EN_ATTENTE
+        CONFIRMEE
+        ANNULEE
+    }
+
+    enum ModePaiement {
+        CARTE_BANCAIRE
+        MOBILE_MONEY
+        VIREMENT
+        ESPECES
+    }
+
+    enum TypeDocument {
+        CONFIRMATION
+        FACTURE
+    }
+
+    class VoyageurDTO {
+        +id_voyageur : int
+        +nom : String
+        +prenom : String
+        +email : String
+        +telephone : String
+    }
+
+    class OffreDTO {
+        +id_offre : int
+        +destination : String
+        +description : String
+        +prix : float
+        +places_disponibles : int
+        +date_depart : Date
+        +date_retour : Date
+    }
+
+    class ReservationDTO {
+        +id_reservation : int
+        +date_reservation : Date
+        +statut : StatutReservation
+    }
+
+    class PaiementDTO {
+        +id_paiement : int
+        +montant : float
+        +mode_paiement : ModePaiement
+        +statut : String
+    }
+
+    class DocumentDTO {
+        +id_document : int
+        +type_document : TypeDocument
+        +date_generation : Date
+    }
+
+}
+
+' ==========================================
+' 2. DAO
+' ==========================================
+
+package "Repositories (DAO)" {
+
+    interface BaseDAO {
+        +get_by_id(id)
+        +get_all()
+        +save(obj)
+        +delete(id)
+    }
+
+    class VoyageurDAO implements BaseDAO {
+        +get_by_email(email)
+    }
+
+    class OffreDAO implements BaseDAO {
+        +get_by_destination(destination)
+    }
+
+    class ReservationDAO implements BaseDAO {
+        +get_by_voyageur(id)
+        +get_by_offre(id)
+    }
+
+    class PaiementDAO implements BaseDAO {
+        +get_by_reservation(id)
+    }
+
+    class DocumentDAO implements BaseDAO {
+        +get_by_paiement(id)
+    }
+
+}
+
+' ==========================================
+' 3. VIEWS
+' ==========================================
+
+package "Views (Flet)" {
+
+    class MainScreen {
+        +build()
+        +on_search()
+    }
+
+    class OffreScreen {
+        +build()
+        +select_offre()
+    }
+
+    class ReservationScreen {
+        +build()
+        +save_reservation()
+    }
+
+    class PaiementScreen {
+        +build()
+        +effectuer_paiement()
+    }
+
+    class ConfirmationScreen {
+        +build()
+        +download_document()
+    }
+
+}
+
+' ==========================================
+' 4. SERVICES
+' ==========================================
+
+package "Services (Logic)" {
+
+    class VoyageurService {
+        +create_voyageur()
+        +retrieve_voyageurs()
+    }
+
+    class OffreService {
+        +retrieve_offres()
+        +verify_availability()
+    }
+
+    class ReservationService {
+        +create_reservation()
+        +cancel_reservation()
+    }
+
+    class PaiementService {
+        +verify_payment()
+        +process_payment()
+    }
+
+    class DocumentService {
+        +generate_confirmation()
+    }
+
+}
+
+' ==========================================
+' RELATIONS
+' ==========================================
+
+ReservationDTO --> StatutReservation
+PaiementDTO --> ModePaiement
+DocumentDTO --> TypeDocument
+
+VoyageurDAO ..> VoyageurDTO : manipule >
+OffreDAO ..> OffreDTO : manipule >
+ReservationDAO ..> ReservationDTO : manipule >
+PaiementDAO ..> PaiementDTO : manipule >
+DocumentDAO ..> DocumentDTO : manipule >
+
+MainScreen ..> OffreService
+OffreScreen ..> OffreService
+ReservationScreen ..> ReservationService
+PaiementScreen ..> PaiementService
+ConfirmationScreen ..> DocumentService
+
+VoyageurService ..> VoyageurDAO
+OffreService ..> OffreDAO
+ReservationService ..> ReservationDAO
+PaiementService ..> PaiementDAO
+DocumentService ..> DocumentDAO
+
+@enduml
